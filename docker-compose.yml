@@ -1,0 +1,75 @@
+name: opsdesk
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-opsdesk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-opsdesk}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-opsdesk} -d ${POSTGRES_DB:-opsdesk}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 4000
+      DATABASE_URL: postgres://${POSTGRES_USER:-opsdesk}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-opsdesk}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
+      SESSION_MAX_AGE_HOURS: ${SESSION_MAX_AGE_HOURS:-8}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      TRUST_PROXY: "true"
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+      SEED_DEMO_PASSWORD: ${SEED_DEMO_PASSWORD:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      AI_TIMEOUT_MS: ${AI_TIMEOUT_MS:-20000}
+      N8N_WEBHOOK_URL: ${N8N_WEBHOOK_URL:-}
+      N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET:-}
+      APP_BASE_URL: ${DOCKER_APP_BASE_URL:-http://localhost:8080}
+    # Migrations run on every start (idempotent); seeding is a separate, explicit step.
+    command: sh -c "node src/database/migrate.js && node src/server.js"
+    expose:
+      - "4000"
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+
+  # Optional workflow automation. Start with: docker compose --profile automation up -d
+  n8n:
+    image: n8nio/n8n:latest
+    profiles: ["automation"]
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      GENERIC_TIMEZONE: ${TZ:-UTC}
+      N8N_SECURE_COOKIE: "false"
+      OPSDESK_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET:-}
+      # Lets the workflow's Code node read OPSDESK_WEBHOOK_SECRET and use the crypto module
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+      NODE_FUNCTION_ALLOW_BUILTIN: crypto
+    volumes:
+      - n8ndata:/home/node/.n8n
+
+volumes:
+  pgdata:
+  n8ndata:

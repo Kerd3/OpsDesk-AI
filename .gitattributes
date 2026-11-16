@@ -1,0 +1,3 @@
+# Keep LF line endings so Dockerfiles, nginx configs and shell commands work in Linux containers.
+* text=auto eol=lf
+*.png binary

@@ -1,0 +1,195 @@
+{
+  "name": "OpsDesk AI – Ticket email notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "opsdesk-events",
+        "responseMode": "responseNode",
+        "options": { "rawBody": true }
+      },
+      "id": "6f0a2c1e-0001-4c3a-9a51-6b1f00000001",
+      "name": "OpsDesk webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "opsdesk-events"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify the HMAC signature and timestamp, and detect duplicate deliveries.\nconst crypto = require('crypto');\nconst secret = $env.OPSDESK_WEBHOOK_SECRET || '';\nconst item = $input.first();\nconst headers = item.json.headers || {};\n\n// Prefer the exact raw body; fall back to re-serialising the parsed JSON.\nconst raw = item.binary?.data?.data\n  ? Buffer.from(item.binary.data.data, 'base64').toString('utf8')\n  : JSON.stringify(item.json.body);\n\nconst timestamp = headers['x-opsdesk-timestamp'] || '';\nconst provided = headers['x-opsdesk-signature'] || '';\nconst expected = 'sha256=' + crypto.createHmac('sha256', secret).update(`${timestamp}.${raw}`).digest('hex');\nconst fresh = Math.abs(Date.now() / 1000 - Number(timestamp)) < 300; // 5 minute replay window\nconst valid = Boolean(secret) && fresh && provided.length === expected.length &&\n  crypto.timingSafeEqual(Buffer.from(provided), Buffer.from(expected));\n\nconst eventId = headers['x-opsdesk-event-id'] || '';\nconst seen = $getWorkflowStaticData('global').seen || {};\n\nreturn [{ json: { valid, duplicate: Boolean(seen[eventId]), eventId, event: item.json.body } }];"
+      },
+      "id": "6f0a2c1e-0002-4c3a-9a51-6b1f00000002",
+      "name": "Verify signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "",
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6f0a2c1e-0003-4c3a-9a51-6b1f00000003",
+      "name": "Signature valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"rejected\", \"reason\": \"invalid signature or stale timestamp\" } }}",
+        "options": { "responseCode": 401 }
+      },
+      "id": "6f0a2c1e-0004-4c3a-9a51-6b1f00000004",
+      "name": "Reject (401)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [660, 460]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "c2",
+              "leftValue": "={{ $json.duplicate }}",
+              "rightValue": "",
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6f0a2c1e-0005-4c3a-9a51-6b1f00000005",
+      "name": "Already processed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [660, 220]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"duplicate\", \"eventId\": $json.eventId } }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "6f0a2c1e-0006-4c3a-9a51-6b1f00000006",
+      "name": "Acknowledge duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [880, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build the notification email for each event type.\nconst { event, eventId } = $input.first().json;\nconst d = event.data || {};\nconst ref = `${d.ticketNumber} – ${d.subject}`;\nconst footer = `\\n\\nView the ticket: ${d.url}\\n\\nThis is an automated message from OpsDesk AI.`;\nlet email = null;\n\nswitch (event.type) {\n  case 'ticket.created':\n    email = { to: d.requester?.email, subject: `[${d.ticketNumber}] We received your request`,\n      text: `Hi ${d.requester?.name},\\n\\nYour support ticket \"${d.subject}\" was created with ${d.priority} priority. The IT team will pick it up shortly.${footer}` };\n    break;\n  case 'ticket.assigned':\n    email = d.assignee && { to: d.assignee.email, subject: `[${d.ticketNumber}] Ticket assigned to you`,\n      text: `Hi ${d.assignee.name},\\n\\n${ref} (${d.priority} priority) has been assigned to you.${footer}` };\n    break;\n  case 'ticket.status_changed':\n    // The resolved event sends its own email, so skip the duplicate status email.\n    if (d.change?.to !== 'resolved') {\n      email = { to: d.requester?.email, subject: `[${d.ticketNumber}] Status updated: ${String(d.change?.to).replaceAll('_', ' ')}`,\n        text: `Hi ${d.requester?.name},\\n\\nThe status of ${ref} changed from ${String(d.change?.from).replaceAll('_', ' ')} to ${String(d.change?.to).replaceAll('_', ' ')}.${footer}` };\n    }\n    break;\n  case 'ticket.resolved':\n    email = { to: d.requester?.email, subject: `[${d.ticketNumber}] Your ticket was resolved`,\n      text: `Hi ${d.requester?.name},\\n\\nIT marked ${ref} as resolved. Please open the ticket to confirm the fix or reopen it if the problem continues.${footer}` };\n    break;\n  default:\n    email = null; // e.g. integration.test: acknowledged without sending email\n}\n\nreturn [{ json: { eventId, type: event.type, sendEmail: Boolean(email?.to), ...(email || {}) } }];"
+      },
+      "id": "6f0a2c1e-0007-4c3a-9a51-6b1f00000007",
+      "name": "Compose email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 320]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "c3",
+              "leftValue": "={{ $json.sendEmail }}",
+              "rightValue": "",
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6f0a2c1e-0008-4c3a-9a51-6b1f00000008",
+      "name": "Email needed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1100, 320]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": { "appendAttribution": false }
+      },
+      "id": "6f0a2c1e-0009-4c3a-9a51-6b1f00000009",
+      "name": "Send Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1320, 220],
+      "webhookId": "opsdesk-gmail",
+      "notes": "Connect your own Gmail OAuth2 credential after importing."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Record the event id only AFTER the email step succeeded, so a failed send is retried by OpsDesk.\nconst store = $getWorkflowStaticData('global');\nstore.seen = store.seen || {};\nconst eventId = $('Compose email').first().json.eventId;\nstore.seen[eventId] = Date.now();\n// Keep the idempotency window bounded (7 days).\nconst cutoff = Date.now() - 7 * 24 * 3600 * 1000;\nfor (const [id, at] of Object.entries(store.seen)) if (at < cutoff) delete store.seen[id];\nreturn [{ json: { status: 'processed', eventId } }];"
+      },
+      "id": "6f0a2c1e-0010-4c3a-9a51-6b1f00000010",
+      "name": "Mark processed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 320]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"processed\", \"eventId\": $json.eventId } }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "6f0a2c1e-0011-4c3a-9a51-6b1f00000011",
+      "name": "Acknowledge",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1760, 320]
+    }
+  ],
+  "connections": {
+    "OpsDesk webhook": { "main": [[{ "node": "Verify signature", "type": "main", "index": 0 }]] },
+    "Verify signature": { "main": [[{ "node": "Signature valid?", "type": "main", "index": 0 }]] },
+    "Signature valid?": {
+      "main": [
+        [{ "node": "Already processed?", "type": "main", "index": 0 }],
+        [{ "node": "Reject (401)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Already processed?": {
+      "main": [
+        [{ "node": "Acknowledge duplicate", "type": "main", "index": 0 }],
+        [{ "node": "Compose email", "type": "main", "index": 0 }]
+      ]
+    },
+    "Compose email": { "main": [[{ "node": "Email needed?", "type": "main", "index": 0 }]] },
+    "Email needed?": {
+      "main": [
+        [{ "node": "Send Gmail", "type": "main", "index": 0 }],
+        [{ "node": "Mark processed", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Gmail": { "main": [[{ "node": "Mark processed", "type": "main", "index": 0 }]] },
+    "Mark processed": { "main": [[{ "node": "Acknowledge", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false
+}

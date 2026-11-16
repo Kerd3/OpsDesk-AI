@@ -1,0 +1,17 @@
+{
+  "name": "opsdesk-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OpsDesk AI — AI-powered IT & business support portal (React, Express, PostgreSQL, Gemini, n8n)",
+  "scripts": {
+    "setup": "npm --prefix backend ci && npm --prefix frontend ci && npm --prefix e2e ci",
+    "db:up": "docker compose up -d db",
+    "db:reset": "npm --prefix backend run db:reset",
+    "dev:api": "npm --prefix backend run dev",
+    "dev:web": "npm --prefix frontend run dev",
+    "build:web": "npm --prefix frontend run build",
+    "test:api": "npm --prefix backend test",
+    "test:e2e": "npm --prefix e2e test",
+    "test": "npm run test:api && npm run test:e2e"
+  }
+}
