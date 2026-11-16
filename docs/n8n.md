@@ -75,6 +75,25 @@ Headers: `X-OpsDesk-Event-Id`, `X-OpsDesk-Event-Type`, `X-OpsDesk-Timestamp` (Un
 4. Open the **Send Gmail** node and connect a Gmail OAuth2 credential (n8n guides you through Google Cloud OAuth). n8n will not publish the workflow until the credential exists.
 5. **Publish/activate** the workflow, then in OpsDesk go to **Settings → Integrations → Send test event**. The delivery should show **Delivered**.
 
+## Using an n8n instance you already run
+
+If n8n runs in its own Docker Compose project (not this repository's `n8n` service):
+
+1. Point OpsDesk at the host's published port. From the OpsDesk API container that is
+   ```env
+   N8N_WEBHOOK_URL=http://host.docker.internal:5678/webhook/opsdesk-events
+   ```
+   (`http://n8n:5678` only resolves inside this repository's Compose network). For an API started with `npm run dev:api`, use `http://localhost:5678/webhook/opsdesk-events`.
+2. Add these to **your** n8n service's environment and restart it. The *Verify signature* and *Mark processed* Code nodes need them:
+   ```yaml
+   OPSDESK_WEBHOOK_SECRET: <the same value as N8N_WEBHOOK_SECRET in OpsDesk's .env>
+   N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"   # lets Code nodes read OPSDESK_WEBHOOK_SECRET
+   NODE_FUNCTION_ALLOW_BUILTIN: crypto     # lets Code nodes compute the HMAC
+   ```
+   If your n8n runs Code nodes in external task runners, set the same variables on the runner containers.
+3. Connect the Gmail credential, then **publish** the workflow. Until it is published n8n answers 404, which OpsDesk records as a failed delivery (retry it from **Settings → Integrations** once the workflow is live).
+4. Don't start this repository's `automation` profile at the same time, because both would publish port 5678.
+
 ## Verified behaviour (n8n 2.47.7)
 
 The workflow was imported and exercised against a live n8n container (with the Gmail node temporarily disabled, because Gmail requires the owner's OAuth consent):
@@ -86,3 +105,7 @@ The workflow was imported and exercised against a live n8n container (with the G
 | Forged signature | `401 {"status":"rejected"}` |
 | Ticket created in the Dockerised app | delivery row `delivered`, 1 attempt, HTTP 200 |
 | Ticket created while n8n was stopped | ticket 201; attempt 1 `Timed out after 5000 ms` → retried → `delivered` on attempt 2 |
+
+Also verified against a separately-run n8n 2.38.7 with a real Gmail credential: a new ticket's `ticket.created` event was emailed to the requester's Gmail inbox. While the Gmail credential's Google sign-in had expired, n8n returned 500 ("credential needs to be reconnected"), OpsDesk retried 5 times and marked the delivery `failed`. After reconnecting the credential, the admin **Retry** delivered it with the same event id. Replaying an already-processed event id returned `duplicate`, and a forged signature returned 401.
+
+**Tip:** if emails stop with "credential needs to be reconnected", the Gmail OAuth sign-in has expired (Google expires sign-ins for OAuth apps in *Testing* mode after 7 days). Reconnect the credential in n8n, click **Save**, then retry failed deliveries from **Settings → Integrations**.

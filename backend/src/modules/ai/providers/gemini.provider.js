@@ -1,6 +1,8 @@
 import { AppError } from '../../../utils/errors.js';
 
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+const MAX_ATTEMPTS = 2;
+const RETRY_DELAY_MS = 1000;
 
 /**
  * Google Gemini provider (REST, no SDK). Converts provider failures into
@@ -22,34 +24,48 @@ export function createGeminiProvider({ apiKey, model, timeoutMs }) {
     async generateJson({ systemInstruction, messages, responseSchema, temperature = 0.2 }) {
       const contents = messages.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.text }] }));
 
+      const body = JSON.stringify({
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        contents,
+        generationConfig: {
+          temperature,
+          maxOutputTokens: 8192,
+          responseMimeType: 'application/json',
+          responseSchema,
+        },
+      });
+      // One deadline covers every attempt, so a retry never makes the employee wait longer than timeoutMs.
+      const deadline = AbortSignal.timeout(timeoutMs);
+
       let response;
-      try {
-        response = await fetch(`${API_BASE}/${encodeURIComponent(model)}:generateContent`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-          body: JSON.stringify({
-            systemInstruction: { parts: [{ text: systemInstruction }] },
-            contents,
-            generationConfig: {
-              temperature,
-              maxOutputTokens: 8192,
-              responseMimeType: 'application/json',
-              responseSchema,
-            },
-          }),
-          signal: AbortSignal.timeout(timeoutMs),
-        });
-      } catch (err) {
-        if (err.name === 'TimeoutError') {
-          throw new AppError(504, 'AI_TIMEOUT', 'The AI assistant took too long to respond. Please try again.');
+      let payload;
+      for (let attempt = 1; ; attempt += 1) {
+        try {
+          response = await fetch(`${API_BASE}/${encodeURIComponent(model)}:generateContent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+            body,
+            signal: deadline,
+          });
+          payload = await response.json().catch(() => null);
+        } catch (err) {
+          if (err.name === 'TimeoutError' || deadline.aborted) {
+            throw new AppError(504, 'AI_TIMEOUT', 'The AI assistant took too long to respond. Please try again.');
+          }
+          console.error('[ai] Gemini network error:', err.cause?.code || err.message);
+          throw new AppError(502, 'AI_UNAVAILABLE', 'The AI service could not be reached. Please try again later.');
         }
-        console.error('[ai] Gemini network error:', err.cause?.code || err.message);
-        throw new AppError(502, 'AI_UNAVAILABLE', 'The AI service could not be reached. Please try again later.');
+        // Gemini reports short-lived overload ("high demand") as 503/500: retry once after a pause.
+        const transient = response.status === 503 || response.status === 500;
+        if (!transient || attempt >= MAX_ATTEMPTS) break;
+        console.warn(`[ai] Gemini HTTP ${response.status} (attempt ${attempt}), retrying: ${payload?.error?.message ?? 'no body'}`);
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+        if (deadline.aborted) throw new AppError(504, 'AI_TIMEOUT', 'The AI assistant took too long to respond. Please try again.');
       }
 
-      const payload = await response.json().catch(() => null);
       if (!response.ok) {
         console.error(`[ai] Gemini HTTP ${response.status}:`, payload?.error?.message ?? 'no body');
+        if (response.status === 503) throw new AppError(503, 'AI_BUSY', 'The AI service is under heavy load right now. Please try again in a moment.');
         if (response.status === 429) throw new AppError(429, 'AI_RATE_LIMITED', 'The AI service is busy right now. Please try again in a minute.');
         if (response.status === 401 || response.status === 403) {
           throw new AppError(503, 'AI_MISCONFIGURED', 'The AI service is not configured correctly. Please contact an administrator.');

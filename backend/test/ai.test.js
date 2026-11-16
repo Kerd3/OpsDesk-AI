@@ -110,6 +110,20 @@ describe('POST /api/ai/chat', () => {
     for (let i = 1; i < sent.length; i += 1) assert.notEqual(sent[i].role, sent[i - 1].role);
   });
 
+  test('follow-up questions keep the topic of the conversation', async () => {
+    const printer = (await query(`SELECT id FROM knowledge_base_articles WHERE slug = 'troubleshoot-office-printer'`)).rows[0];
+    const res = await employee.post('/api/ai/chat').send({
+      message: 'I already restarted it and it still does not work. What now?',
+      history: [
+        { role: 'user', content: 'My printer shows offline' },
+        { role: 'assistant', content: 'Check the printer display and the print queue.' },
+      ],
+    });
+    assert.equal(res.status, 200);
+    assert.ok(mock.state.requests[0].messages.at(-1).text.includes(printer.id), 'printer article is in the context');
+    assert.ok(res.body.data.sources.some((s) => s.slug === 'troubleshoot-office-printer'));
+  });
+
   test('validates input', async () => {
     assert.equal((await employee.post('/api/ai/chat').send({})).status, 422);
     assert.equal((await employee.post('/api/ai/chat').send({ message: ' ' })).status, 422);

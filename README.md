@@ -13,7 +13,7 @@
 - **Reliable automation.** Ticket events use a transactional outbox → HMAC-signed webhooks → n8n → Gmail. Delivery retries with exponential backoff and idempotent event ids, and an admin delivery monitor offers one-click retry. n8n being down never affects tickets.
 - **Live analytics.** Role-specific dashboards and reports (bar, line and donut charts plus tables) are computed from SQL, with date filters.
 - **Professional, responsive UI.** React 19, Tailwind CSS 4 and accessible components, with loading, empty, error and success states on every page. Verified for overflow at 1440/1024/768/390 px.
-- **Tested.** 113 API tests and 24 Playwright end-to-end tests, all passing. See [docs/testing.md](docs/testing.md).
+- **Tested.** 121 API tests, 24 Playwright end-to-end tests and 11 live checks against the real Gemini API, all passing. See [docs/testing.md](docs/testing.md).
 
 ## Tech stack
 
@@ -57,7 +57,7 @@ Open **http://localhost:8080** and sign in with a demo account (password = `SEED
 | IT Support | `support@opsdesk.local` |
 | Employee | `employee@opsdesk.local` |
 
-To enable the AI assistant, set `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`) in `.env`, then run `docker compose up -d api`. Without a key, the assistant clearly says it is not configured and offers the knowledge base and ticket creation instead.
+To enable the AI assistant, set `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`, default `gemini-3.1-flash-lite`) in `.env`, then run `docker compose up -d api`. Without a key, the assistant clearly says it is not configured and offers the knowledge base and ticket creation instead.
 
 To enable email notifications, see [docs/n8n.md](docs/n8n.md).
 
@@ -107,7 +107,7 @@ All configuration comes from environment variables. See [.env.example](.env.exam
 | `TRUST_PROXY` | `true` behind a reverse proxy (set automatically in Docker) |
 | `CORS_ORIGINS` | Allowed browser origins (the SPA is normally same-origin) |
 | `SEED_DEMO_PASSWORD` | Password for the fictional demo accounts (seeding refuses to run in production) |
-| `GEMINI_API_KEY`, `GEMINI_MODEL` | Enable the AI assistant (server-side only, never sent to the browser) |
+| `GEMINI_API_KEY`, `GEMINI_MODEL` | Enable the AI assistant (server-side only, never sent to the browser). Older models such as `gemini-2.5-flash` are no longer offered to new API keys. |
 | `AI_TIMEOUT_MS`, `AI_RATE_LIMIT_PER_MINUTE` | AI request timeout and per-user limit |
 | `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_SECRET` | Outbound webhook target and HMAC signing secret |
 | `WEBHOOK_TIMEOUT_MS`, `WEBHOOK_MAX_ATTEMPTS`, `WEBHOOK_POLL_INTERVAL_MS` | Delivery tuning |

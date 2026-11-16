@@ -59,10 +59,16 @@ export async function chat(_user, { message, history }) {
   const provider = await assertAvailable();
   const turns = normalizeHistory(history);
 
-  // Include the previous user turn so follow-ups ("it still fails") keep their topic.
+  // Follow-ups ("I restarted it and it still fails") rarely name the topic, and their generic
+  // words can match unrelated articles. The previous question is searched separately (joining
+  // the texts would dilute ts_rank below the relevance floor) and merged after the new
+  // message's matches, so a new topic leads while the conversation's subject stays available.
   const previousUserText = [...turns].reverse().find((t) => t.role === 'user')?.text ?? '';
-  let articles = await retrievePublishedArticles(message);
-  if (!articles.length && previousUserText) articles = await retrievePublishedArticles(`${message} ${previousUserText}`);
+  const [current, previous] = await Promise.all([
+    retrievePublishedArticles(message),
+    previousUserText ? retrievePublishedArticles(previousUserText) : [],
+  ]);
+  const articles = [...current, ...previous.filter((p) => !current.some((c) => c.id === p.id))].slice(0, config.ai.maxContextArticles);
 
   const userTurn = `${buildKnowledgeContext(articles)}\n\n<employee_message>\n${escapeData(message)}\n</employee_message>`;
   const raw = await provider.generateJson({
