@@ -19,8 +19,14 @@ npm run test:e2e                             # Playwright suite (starts its own 
 
 Executed on 2026-11-16 (Windows 11, Node.js 24.17, PostgreSQL 17, Chromium 159):
 
-- **Backend: 121 tests, 121 passed, 0 failed** (`npm run test:api`, ~35 s)
-- **End-to-end: 24 tests, 24 passed, 0 failed** (`npm run test:e2e`, ~3 min)
+- **Backend: 125 tests, 125 passed, 0 failed** (`npm run test:api`, ~35 s)
+- **End-to-end: 28 tests, 28 passed, 0 failed** (`npm run test:e2e`, ~4 min), including the accessibility scan
+
+### Accessibility (WCAG 2.1 A + AA)
+
+`e2e/tests/accessibility.spec.js` runs [axe-core](https://github.com/dequelabs/axe-core) on 23 page states: sign-in (with and without errors), every employee and administrator page, the AI assistant with an answer and source links, the notification menu, a dialog, and the mobile navigation drawer. **Result: 0 violations.** Two issues it found were fixed (see the defects table).
+
+Built in by design: every form control has a label; errors are linked with `aria-describedby`; dialogs trap focus, close on Escape and restore focus; there's a skip-to-content link and visible focus rings; and menus, switches, tabs and radios use the right ARIA roles. Reduced-motion preferences shorten animations.
 
 ### Live Gemini checks
 
@@ -72,4 +78,6 @@ Run against the Dockerised app with a real `GEMINI_API_KEY` (`gemini-3.1-flash-l
 | AI assistant returned "not available" for every question with a new API key | Google retired `gemini-2.5-flash` for new keys | Default model changed to `gemini-3.1-flash-lite` (the fastest reliable model for this key; `gemini-3.5-flash` took ~18 s and newer models timed out) |
 | Follow-up questions lost their topic | Generic follow-up words matched unrelated articles, and joining the previous question diluted `ts_rank` below the relevance floor | The new message and the previous question are searched separately and merged |
 | Occasional AI errors at busy times | Gemini returns 503 "high demand" during spikes | One automatic retry within the same 20 s deadline |
+| Low-contrast text (sidebar section labels, timestamps, "Unassigned", chart percentages, helper text) | `text-slate-400` on white is 2.6:1, below WCAG AA's 4.5:1 | Informative text uses `slate-500` (about 4.8:1); placeholder and disabled styles unchanged |
+| User menu's spoken name ("Open user menu") didn't match its visible text ("Sam Carter") | Voice-control users say what they see | The name now comes from the content: "Sam Carter account menu" |
 | nginx security headers missing on every page | nginx drops server-level `add_header` in locations that define their own | Headers moved to an included snippet used by every location |

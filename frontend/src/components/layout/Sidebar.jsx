@@ -44,7 +44,7 @@ export function Sidebar({ open, onClose }) {
           if (!items.length) return null;
           return (
             <div key={group.section}>
-              <p className="px-3 pb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">{group.section}</p>
+              <p className="px-3 pb-2 text-[11px] font-semibold tracking-wider text-slate-500 uppercase">{group.section}</p>
               <ul className="space-y-0.5">
                 {items.map((item) => (
                   <li key={item.to}>
@@ -60,7 +60,7 @@ export function Sidebar({ open, onClose }) {
                     >
                       {({ isActive }) => (
                         <>
-                          <item.icon className={`size-[18px] ${isActive ? 'text-brand-600' : 'text-slate-400 group-hover:text-slate-600'}`} aria-hidden="true" />
+                          <item.icon className={`size-[18px] ${isActive ? 'text-brand-600' : 'text-slate-500 group-hover:text-slate-600'}`} aria-hidden="true" />
                           {user.role === 'employee' && item.employeeLabel ? item.employeeLabel : item.label}
                         </>
                       )}
@@ -73,7 +73,7 @@ export function Sidebar({ open, onClose }) {
         })}
       </nav>
       <div className="border-t border-slate-200 p-4">
-        <p className="text-xs text-slate-400">Demo environment · fictional data</p>
+        <p className="text-xs text-slate-500">Demo environment · fictional data</p>
       </div>
     </div>
   );

@@ -13,7 +13,7 @@
 - **Reliable automation.** Ticket events use a transactional outbox → HMAC-signed webhooks → n8n → Gmail. Delivery retries with exponential backoff and idempotent event ids, and an admin delivery monitor offers one-click retry. n8n being down never affects tickets.
 - **Live analytics.** Role-specific dashboards and reports (bar, line and donut charts plus tables) are computed from SQL, with date filters.
 - **Professional, responsive UI.** React 19, Tailwind CSS 4 and accessible components, with loading, empty, error and success states on every page. Verified for overflow at 1440/1024/768/390 px.
-- **Tested.** 121 API tests, 24 Playwright end-to-end tests and 11 live checks against the real Gemini API, all passing. See [docs/testing.md](docs/testing.md).
+- **Tested.** 125 API tests, 28 Playwright end-to-end tests (including a WCAG 2.1 AA accessibility scan with 0 violations) and 11 live checks against the real Gemini API, all passing. See [docs/testing.md](docs/testing.md).
 
 ## Tech stack
 
@@ -147,6 +147,7 @@ The first E2E run needs `npx --prefix e2e playwright install chromium`, and the 
 - [API reference](docs/api.md): every endpoint with roles and rules
 - [n8n automation](docs/n8n.md): events, signatures, retries, setup
 - [Testing](docs/testing.md): how to run, coverage, results, defects fixed
+- [Deployment](docs/deployment.md): Vercel (frontend) + Render (API and PostgreSQL), first admin, n8n
 
 ## Screenshots
 
@@ -159,6 +160,7 @@ The first E2E run needs `npx --prefix e2e playwright install chromium`, and the 
 
 ## Production notes
 
+- Step-by-step hosting guide: [docs/deployment.md](docs/deployment.md) (Vercel + Render, with `vercel.json` and `render.yaml` included).
 - Serve over HTTPS and set `NODE_ENV=production` and `COOKIE_SECURE=true` (the API refuses to start in production without secure cookies).
-- Do **not** run the seed in production (it refuses), and create real administrator accounts instead of the demo accounts.
+- Do **not** run the demo seed in production (it refuses). Create your administrator with `npm --prefix backend run admin:create` and optionally load the sample help articles with `npm --prefix backend run seed:kb`.
 - Keep secrets in your platform's secret manager. Only non-secret toggles are stored in the database.

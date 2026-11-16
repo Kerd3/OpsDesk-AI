@@ -67,7 +67,7 @@ export function DonutChart({ rows, labels = {}, height = 240, colors = CHART_COL
               <span className="truncate text-slate-600">{d.name}</span>
             </span>
             <span className="font-medium text-slate-900 tabular-nums">
-              {d.value} <span className="font-normal text-slate-400">({total ? Math.round((d.value / total) * 100) : 0}%)</span>
+              {d.value} <span className="font-normal text-slate-500">({total ? Math.round((d.value / total) * 100) : 0}%)</span>
             </span>
           </li>
         ))}

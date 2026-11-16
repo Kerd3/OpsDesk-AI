@@ -89,7 +89,7 @@ export default function TicketListPage({ scope }) {
           <div className="flex w-full items-center gap-2 sm:w-auto">
             <label className="sr-only" htmlFor="from">Created from</label>
             <Input id="from" type="date" value={filters.from ?? ''} onChange={(e) => setFilters({ from: e.target.value })} className="h-9 py-1.5" title="Created from" />
-            <span className="text-xs text-slate-400">to</span>
+            <span className="text-xs text-slate-500">to</span>
             <label className="sr-only" htmlFor="to">Created to</label>
             <Input id="to" type="date" value={filters.to ?? ''} onChange={(e) => setFilters({ to: e.target.value })} className="h-9 py-1.5" title="Created to" />
           </div>

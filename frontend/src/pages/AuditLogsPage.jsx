@@ -45,7 +45,7 @@ export default function AuditLogsPage() {
             <p className="text-xs text-slate-500">{e.actor.email}</p>
           </div>
         ) : (
-          <span className="text-slate-400">System / unknown</span>
+          <span className="text-slate-500">System / unknown</span>
         ),
     },
     { key: 'resource', header: 'Resource', className: 'hidden md:table-cell', render: (e) => <span className="text-slate-600">{e.resourceType}{e.metadata?.ticketNumber ? ` · ${e.metadata.ticketNumber}` : e.metadata?.assetTag ? ` · ${e.metadata.assetTag}` : e.metadata?.title ? ` · ${e.metadata.title}` : ''}</span> },
@@ -63,7 +63,7 @@ export default function AuditLogsPage() {
             <div className="col-span-2 flex items-center gap-2">
               <label htmlFor="afrom" className="sr-only">From</label>
               <Input id="afrom" type="date" value={filters.from ?? ''} onChange={(e) => setFilters({ from: e.target.value })} className="h-9 py-1.5" />
-              <span className="text-xs text-slate-400">to</span>
+              <span className="text-xs text-slate-500">to</span>
               <label htmlFor="ato" className="sr-only">To</label>
               <Input id="ato" type="date" value={filters.to ?? ''} onChange={(e) => setFilters({ to: e.target.value })} className="h-9 py-1.5" />
             </div>

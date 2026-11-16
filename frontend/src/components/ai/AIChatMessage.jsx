@@ -62,7 +62,7 @@ export function AIChatMessage({ message, userName, onCreateTicket, draftLoading 
                   <Link to={`/knowledge-base/${s.slug}`} target="_blank" className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-brand-300 hover:text-brand-700">
                     <BookOpen className="size-3.5 text-brand-500" aria-hidden="true" />
                     {s.title}
-                    <ExternalLink className="size-3 text-slate-400" aria-hidden="true" />
+                    <ExternalLink className="size-3 text-slate-500" aria-hidden="true" />
                   </Link>
                 </li>
               ))}

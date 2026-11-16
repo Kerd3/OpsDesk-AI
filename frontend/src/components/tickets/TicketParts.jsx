@@ -37,7 +37,7 @@ export function ticketColumns({ showRequester = true, showAssignee = true, showU
       ? [{ key: 'requester', header: 'Requester', className: 'hidden lg:table-cell', render: (t) => <PersonCell person={t.requester} sub={t.requester.department} /> }]
       : []),
     ...(showAssignee
-      ? [{ key: 'assignee', header: 'Assignee', className: 'hidden md:table-cell', render: (t) => (t.assignee ? <PersonCell person={t.assignee} /> : <span className="text-slate-400">Unassigned</span>) }]
+      ? [{ key: 'assignee', header: 'Assignee', className: 'hidden md:table-cell', render: (t) => (t.assignee ? <PersonCell person={t.assignee} /> : <span className="text-slate-500">Unassigned</span>) }]
       : []),
     ...(showUpdated
       ? [{ key: 'updated', header: 'Updated', sortKey: 'updated', className: 'hidden sm:table-cell whitespace-nowrap', render: (t) => <span title={formatDateTime(t.updatedAt)}>{timeAgo(t.updatedAt)}</span> }]
@@ -92,7 +92,7 @@ export function CommentThread({ comments, currentUserId }) {
                   <Lock className="size-3" aria-hidden="true" /> Internal note
                 </Badge>
               )}
-              <time className="ml-auto text-xs text-slate-400" dateTime={c.createdAt} title={formatDateTime(c.createdAt)}>
+              <time className="ml-auto text-xs text-slate-500" dateTime={c.createdAt} title={formatDateTime(c.createdAt)}>
                 {timeAgo(c.createdAt)}
               </time>
             </div>
@@ -130,7 +130,7 @@ export function ActivityTimeline({ activity }) {
             <p className="text-sm text-slate-700">
               <span className="font-medium text-slate-900">{a.actor?.fullName ?? 'System'}</span> {describeActivity(a, a.actor?.fullName)}
             </p>
-            <time className="text-xs text-slate-400" dateTime={a.createdAt}>
+            <time className="text-xs text-slate-500" dateTime={a.createdAt}>
               {formatDateTime(a.createdAt)}
             </time>
           </li>

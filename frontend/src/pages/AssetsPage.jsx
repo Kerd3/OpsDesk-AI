@@ -60,7 +60,7 @@ export default function AssetsPage() {
       ),
     },
     { key: 'status', header: 'Status', render: (a) => <AssetStatusBadge status={a.status} /> },
-    ...(isStaff ? [{ key: 'assigned', header: 'Assigned to', className: 'hidden md:table-cell', render: (a) => (a.assignedTo ? <PersonCell person={a.assignedTo} sub={a.assignedTo.department} /> : <span className="text-slate-400">—</span>) }] : []),
+    ...(isStaff ? [{ key: 'assigned', header: 'Assigned to', className: 'hidden md:table-cell', render: (a) => (a.assignedTo ? <PersonCell person={a.assignedTo} sub={a.assignedTo.department} /> : <span className="text-slate-500">—</span>) }] : []),
     { key: 'model', header: 'Model', className: 'hidden lg:table-cell', render: (a) => [a.manufacturer, a.model].filter(Boolean).join(' ') || '—' },
     { key: 'serial', header: 'Serial', className: 'hidden xl:table-cell font-mono text-xs', render: (a) => a.serialNumber ?? '—' },
     { key: 'location', header: 'Location', className: 'hidden lg:table-cell', render: (a) => a.location ?? '—' },

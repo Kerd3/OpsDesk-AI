@@ -110,7 +110,7 @@ function ArticleForm({ article }) {
                   )}
                 </Field>
               ) : (
-                <div className="min-h-[24rem] rounded-lg border border-slate-200 p-5">{content?.trim() ? <MarkdownView content={content} /> : <p className="text-sm text-slate-400">Nothing to preview yet.</p>}</div>
+                <div className="min-h-[24rem] rounded-lg border border-slate-200 p-5">{content?.trim() ? <MarkdownView content={content} /> : <p className="text-sm text-slate-500">Nothing to preview yet.</p>}</div>
               )}
             </div>
           </div>

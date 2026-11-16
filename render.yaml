@@ -1,0 +1,53 @@
+# Render Blueprint: the OpsDesk AI API + PostgreSQL.
+# The React frontend is deployed separately on Vercel (see docs/deployment.md),
+# which forwards /api/* to this service so the session cookie stays first-party.
+#
+# Values marked `sync: false` are entered in the Render dashboard when the
+# Blueprint is created. Never commit real secrets.
+
+services:
+  - type: web
+    name: opsdesk-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    # Apply pending migrations on every deploy, then start the API.
+    dockerCommand: sh -c "node src/database/migrate.js && node src/server.js"
+    healthCheckPath: /api/health
+    # Free instances sleep when idle: webhook deliveries then wait until the
+    # next request wakes the service. Use a paid plan for always-on delivery.
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: opsdesk-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "true"
+      # Browser → Vercel → Render's proxy → API: trust two proxy hops so the
+      # client's IP (used for sign-in rate limiting) and HTTPS are detected.
+      - key: TRUST_PROXY
+        value: "2"
+      - key: CORS_ORIGINS
+        sync: false # e.g. https://opsdesk-ai.vercel.app
+      - key: APP_BASE_URL
+        sync: false # same as above; used for links in notification emails
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.1-flash-lite
+      - key: N8N_WEBHOOK_URL
+        sync: false # public n8n URL, e.g. https://you.app.n8n.cloud/webhook/opsdesk-events
+      - key: N8N_WEBHOOK_SECRET
+        sync: false
+
+databases:
+  - name: opsdesk-db
+    databaseName: opsdesk
+    user: opsdesk
+    plan: free
+    postgresMajorVersion: "17"

@@ -47,7 +47,7 @@ export const Select = forwardRef(function Select({ options, placeholder, classNa
           </option>
         ))}
       </select>
-      <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+      <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-slate-500" aria-hidden="true" />
     </div>
   );
 });
@@ -55,7 +55,7 @@ export const Select = forwardRef(function Select({ options, placeholder, classNa
 export function SearchInput({ value, onChange, placeholder = 'Search…', label = 'Search', className = '' }) {
   return (
     <div className={`relative ${className}`}>
-      <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+      <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500" aria-hidden="true" />
       <input type="search" aria-label={label} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="input pl-9" />
     </div>
   );

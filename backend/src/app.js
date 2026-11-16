@@ -16,7 +16,7 @@ const PgSession = connectPgSimple(session);
 export function createApp() {
   const app = express();
   app.disable('x-powered-by');
-  if (config.trustProxy) app.set('trust proxy', 1);
+  if (config.trustProxy) app.set('trust proxy', config.trustProxy);
 
   // The API serves JSON only, so the strictest CSP is safe here.
   app.use(

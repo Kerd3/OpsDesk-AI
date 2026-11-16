@@ -179,7 +179,7 @@ export default function AssistantPage() {
                 <Send className="size-4" />
               </Button>
             </div>
-            <p className="mt-2 flex justify-between gap-3 text-xs text-slate-400">
+            <p className="mt-2 flex justify-between gap-3 text-xs text-slate-500">
               <span>The assistant can make mistakes and cannot change accounts or systems. Enter to send, Shift+Enter for a new line.</span>
               <span className="tabular-nums">{text.length}/{MAX_LENGTH}</span>
             </p>

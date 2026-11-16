@@ -42,7 +42,7 @@ export function ToastProvider({ children }) {
             >
               <Icon className={`mt-0.5 size-5 shrink-0 ${className}`} aria-hidden="true" />
               <p className="flex-1 text-sm text-slate-700">{t.message}</p>
-              <button type="button" onClick={() => dismiss(t.id)} className="rounded p-0.5 text-slate-400 hover:text-slate-600" aria-label="Dismiss notification">
+              <button type="button" onClick={() => dismiss(t.id)} className="rounded p-0.5 text-slate-500 hover:text-slate-600" aria-label="Dismiss notification">
                 <X className="size-4" />
               </button>
             </div>

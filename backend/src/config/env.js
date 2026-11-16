@@ -36,7 +36,9 @@ export const config = {
     maxAgeMs: int('SESSION_MAX_AGE_HOURS', 8) * 60 * 60 * 1000,
     cookieSecure: bool('COOKIE_SECURE', isProduction),
   },
-  trustProxy: bool('TRUST_PROXY', false),
+  // Number of reverse proxies in front of the API ("true" = 1). Needed so req.ip is the
+  // real client (rate limiting) and HTTPS is detected for Secure cookies.
+  trustProxy: /^\d+$/.test(str('TRUST_PROXY')) ? int('TRUST_PROXY', 0) : bool('TRUST_PROXY', false) ? 1 : 0,
   corsOrigins: str('CORS_ORIGINS', 'http://localhost:5173')
     .split(',')
     .map((o) => o.trim())

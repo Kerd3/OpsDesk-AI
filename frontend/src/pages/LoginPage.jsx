@@ -64,7 +64,7 @@ export default function LoginPage() {
               {(a) => (
                 <div className="relative">
                   <Input {...a} type={showPassword ? 'text' : 'password'} autoComplete="current-password" className="pr-10" invalid={!!errors.password} {...register('password', { required: 'Password is required' })} />
-                  <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600" aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                  <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded p-1 text-slate-500 hover:text-slate-600" aria-label={showPassword ? 'Hide password' : 'Show password'}>
                     {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                   </button>
                 </div>

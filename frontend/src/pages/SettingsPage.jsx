@@ -85,7 +85,7 @@ function PasswordSettings() {
 
 const StatusLine = ({ ok, label, warn }) => (
   <p className="flex items-center gap-2 text-sm">
-    {ok ? <CheckCircle2 className="size-4 text-emerald-600" aria-hidden="true" /> : warn ? <CircleAlert className="size-4 text-amber-600" aria-hidden="true" /> : <XCircle className="size-4 text-slate-400" aria-hidden="true" />}
+    {ok ? <CheckCircle2 className="size-4 text-emerald-600" aria-hidden="true" /> : warn ? <CircleAlert className="size-4 text-amber-600" aria-hidden="true" /> : <XCircle className="size-4 text-slate-500" aria-hidden="true" />}
     <span className="text-slate-700">{label}</span>
   </p>
 );

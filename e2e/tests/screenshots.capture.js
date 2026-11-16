@@ -47,9 +47,8 @@ test('capture documentation screenshots', async ({ page }) => {
   await login(page, 'employee');
   await settle(page);
   await page.screenshot({ path: out('09-employee-dashboard'), fullPage: true });
-  await page.goto('/assistant');
-  await settle(page);
-  await page.screenshot({ path: out('10-ai-assistant') });
+  // 10-ai-assistant.png shows a real Gemini answer, so it is captured from the running
+  // app instead (see scripts/capture-live-assistant.js); the test stack uses a mock AI.
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/my-tickets');

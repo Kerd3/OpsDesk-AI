@@ -98,7 +98,7 @@ export default function AssetDetailsPage() {
                       <p className="text-sm text-slate-700">
                         <span className="font-medium text-slate-900">{h.actorName ?? 'System'}</span> {describeAssetEvent(h)}
                       </p>
-                      <time className="text-xs text-slate-400">{formatDateTime(h.createdAt)}</time>
+                      <time className="text-xs text-slate-500">{formatDateTime(h.createdAt)}</time>
                     </li>
                   ))}
                 </ol>
