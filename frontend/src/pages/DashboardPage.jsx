@@ -12,6 +12,7 @@ import { ticketColumns, TicketCard, ActivityFeed } from '../components/tickets/T
 import { TICKET_CATEGORIES, ASSET_STATUSES } from '../utils/labels.js';
 import { formatHours } from '../utils/format.js';
 import { CategoryBarChart, DonutChart } from '../components/charts/Charts.jsx';
+import { StatusDistribution } from '../components/ui/StatusDistribution.jsx';
 
 
 const greeting = () => {
@@ -28,16 +29,6 @@ export default function DashboardPage() {
     <PageHeader
       title={`${greeting()}, ${user.fullName.split(' ')[0]}`}
       description={user.role === 'employee' ? 'Track your requests and get help fast.' : user.role === 'it_support' ? 'Here is what needs your attention today.' : 'An overview of IT support across the organization.'}
-      actions={
-        <>
-          <ButtonLink to="/assistant" variant="secondary" icon={Sparkles}>
-            Ask AI
-          </ButtonLink>
-          <ButtonLink to="/tickets/new" icon={Plus}>
-            New ticket
-          </ButtonLink>
-        </>
-      }
     />
   );
 
@@ -69,14 +60,20 @@ function AdminDashboard({ data, loading }) {
   const s = data?.stats ?? {};
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
-        <DashboardCard loading={loading} label="Total employees" value={s.totalEmployees} icon={Users} accent="slate" to="/admin/users?role=employee" />
-        <DashboardCard loading={loading} label="Total tickets" value={s.totalTickets} icon={Ticket} to="/tickets" />
-        <DashboardCard loading={loading} label="Open" value={s.openTickets} icon={CircleDot} accent="blue" hint={s.unassignedTickets != null ? `${s.unassignedTickets} unassigned` : undefined} to="/tickets?status=open" />
-        <DashboardCard loading={loading} label="In progress" value={s.inProgressTickets} icon={Loader} accent="amber" hint={s.waitingTickets != null ? `${s.waitingTickets} waiting on employees` : undefined} to="/tickets?status=in_progress" />
-        <DashboardCard loading={loading} label="Resolved" value={s.resolvedTickets} icon={CheckCircle2} accent="green" to="/tickets?status=resolved,closed" />
-        <DashboardCard loading={loading} label="Avg. resolution time" value={formatHours(s.averageResolutionHours)} icon={Timer} accent="brand" hint="All resolved tickets" to="/reports" />
-      </div>
+      <StatusDistribution
+        loading={loading}
+        segments={[
+          { key: 'open', label: 'Open', count: s.openTickets, color: 'bg-blue-500', to: '/tickets?status=open' },
+          { key: 'progress', label: 'In progress', count: s.inProgressTickets, color: 'bg-violet-500', to: '/tickets?status=in_progress' },
+          { key: 'waiting', label: 'Waiting on employee', count: s.waitingTickets, color: 'bg-amber-500', to: '/tickets?status=waiting_for_employee' },
+          { key: 'resolved', label: 'Resolved or closed', count: s.resolvedTickets, color: 'bg-emerald-500', to: '/tickets?status=resolved,closed' },
+        ]}
+        extras={[
+          { label: 'Unassigned', value: s.unassignedTickets, to: '/tickets?scope=unassigned&status=open,in_progress,waiting_for_employee' },
+          { label: 'Average resolution', value: formatHours(s.averageResolutionHours), to: '/reports' },
+          { label: 'Total employees', value: s.totalEmployees, to: '/admin/users?role=employee' },
+        ]}
+      />
 
       <div className="grid gap-6 xl:grid-cols-5">
         <Card title="Tickets by category" className="xl:col-span-3">
@@ -105,10 +102,10 @@ function SupportDashboard({ data, loading }) {
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-5">
         <DashboardCard loading={loading} label="Assigned to me" value={s.assignedTickets} icon={UserCheck} to="/tickets?scope=assigned&status=open,in_progress,waiting_for_employee" />
-        <DashboardCard loading={loading} label="Unassigned" value={s.unassignedTickets} icon={Inbox} accent="blue" to="/tickets?scope=unassigned&status=open,in_progress,waiting_for_employee" />
-        <DashboardCard loading={loading} label="Urgent" value={s.urgentTickets} icon={AlertTriangle} accent="red" to="/tickets?priority=urgent&status=open,in_progress,waiting_for_employee" />
-        <DashboardCard loading={loading} label="Waiting on employee" value={s.pendingTickets} icon={Hourglass} accent="amber" to="/tickets?scope=assigned&status=waiting_for_employee" />
-        <DashboardCard loading={loading} label="Resolved by me" value={s.resolvedTickets} icon={CheckCircle2} accent="green" hint={s.resolvedThisWeek != null ? `${s.resolvedThisWeek} this week` : undefined} to="/tickets?scope=assigned&status=resolved,closed" />
+        <DashboardCard loading={loading} label="Unassigned" value={s.unassignedTickets} icon={Inbox} to="/tickets?scope=unassigned&status=open,in_progress,waiting_for_employee" />
+        <DashboardCard loading={loading} label="Urgent" value={s.urgentTickets} icon={AlertTriangle} to="/tickets?priority=urgent&status=open,in_progress,waiting_for_employee" />
+        <DashboardCard loading={loading} label="Waiting on employee" value={s.pendingTickets} icon={Hourglass} to="/tickets?scope=assigned&status=waiting_for_employee" />
+        <DashboardCard loading={loading} label="Resolved by me" value={s.resolvedTickets} icon={CheckCircle2} hint={s.resolvedThisWeek != null ? `${s.resolvedThisWeek} this week` : undefined} to="/tickets?scope=assigned&status=resolved,closed" />
       </div>
       <div className="grid gap-6 xl:grid-cols-5">
         <Card title="Active queue" description="Your tickets and unassigned requests, highest priority first" className="xl:col-span-3" bodyClassName="" actions={<Link to="/tickets?status=open,in_progress,waiting_for_employee" className="text-xs font-medium text-brand-700 hover:underline">Open queue</Link>}>
@@ -133,22 +130,21 @@ function EmployeeDashboard({ data, loading }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-        <DashboardCard loading={loading} label="My open tickets" value={s.openTickets} icon={CircleDot} accent="blue" to="/my-tickets?status=open,in_progress" />
-        <DashboardCard loading={loading} label="Waiting on me" value={s.pendingTickets} icon={Hourglass} accent="amber" hint="IT needs your reply" to="/my-tickets?status=waiting_for_employee" />
-        <DashboardCard loading={loading} label="Resolved" value={s.resolvedTickets} icon={CheckCircle2} accent="green" to="/my-tickets?status=resolved,closed" />
-        <DashboardCard loading={loading} label="My equipment" value={s.assignedAssets} icon={Laptop} accent="slate" to="/assets" />
+        <DashboardCard loading={loading} label="My open tickets" value={s.openTickets} icon={CircleDot} to="/my-tickets?status=open,in_progress" />
+        <DashboardCard loading={loading} label="Waiting on me" value={s.pendingTickets} icon={Hourglass} hint="IT needs your reply" to="/my-tickets?status=waiting_for_employee" />
+        <DashboardCard loading={loading} label="Resolved" value={s.resolvedTickets} icon={CheckCircle2} to="/my-tickets?status=resolved,closed" />
+        <DashboardCard loading={loading} label="My equipment" value={s.assignedAssets} icon={Laptop} to="/assets" />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-3">
-        <div className="card relative overflow-hidden p-6">
-          <div className="absolute -top-10 -right-10 size-40 rounded-full bg-brand-50" aria-hidden="true" />
-          <div className="relative">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-brand-700">
-              <Sparkles className="size-5 text-white" aria-hidden="true" />
+        <div className="card flex flex-col p-4 sm:p-6">
+          <div>
+            <div className="flex size-10 items-center justify-center rounded-full border border-brand-300 bg-brand-50">
+              <Sparkles className="size-5 text-brand-500" aria-hidden="true" />
             </div>
             <h2 className="mt-4 text-base font-semibold text-slate-900">Have an IT problem?</h2>
             <p className="mt-1 text-sm text-slate-500">Describe it to the AI assistant. It answers from approved company articles and can draft a ticket for you.</p>
-            <ButtonLink to="/assistant" className="mt-5" icon={Sparkles}>
+            <ButtonLink to="/assistant" className="mt-6" icon={Sparkles}>
               Ask the AI assistant
             </ButtonLink>
           </div>
@@ -172,8 +168,8 @@ function EmployeeDashboard({ data, loading }) {
           <ul className="grid gap-1 sm:grid-cols-2">
             {data.popularArticles.map((a) => (
               <li key={a.id}>
-                <Link to={`/knowledge-base/${a.slug}`} className="group flex items-start gap-3 rounded-lg p-3 hover:bg-slate-50">
-                  <BookOpen className="mt-0.5 size-4 shrink-0 text-brand-500" aria-hidden="true" />
+                <Link to={`/knowledge-base/${a.slug}`} className="group flex items-start gap-3 rounded-md p-3 hover:bg-slate-50">
+                  <BookOpen className="mt-0.5 size-4 shrink-0 text-slate-500" aria-hidden="true" />
                   <span className="min-w-0">
                     <span className="block text-sm font-medium text-slate-900 group-hover:text-brand-700">{a.title}</span>
                     <span className="line-clamp-1 text-xs text-slate-500">{a.description}</span>

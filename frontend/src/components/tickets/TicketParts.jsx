@@ -60,7 +60,7 @@ export function PersonCell({ person, sub }) {
 /** TicketCard: compact ticket summary used on dashboards. */
 export function TicketCard({ ticket }) {
   return (
-    <Link to={`/tickets/${ticket.id}`} className="block rounded-lg px-3 py-3 transition-colors hover:bg-slate-50">
+    <Link to={`/tickets/${ticket.id}`} className="block rounded-md px-3 py-3 transition-colors hover:bg-slate-50">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-slate-900">{ticket.subject}</p>
@@ -83,7 +83,7 @@ export function CommentThread({ comments, currentUserId }) {
       {comments.map((c) => (
         <li key={c.id} className="flex gap-3">
           <Avatar name={c.author.fullName} />
-          <div className={`min-w-0 flex-1 rounded-xl border px-4 py-3 ${c.isInternal ? 'border-amber-200 bg-amber-50/60' : c.author.id === currentUserId ? 'border-brand-100 bg-brand-50/40' : 'border-slate-200 bg-white'}`}>
+          <div className={`min-w-0 flex-1 rounded-xl border px-4 py-3 ${c.isInternal ? 'note-hatch border-dashed border-amber-300 bg-amber-50/50' : c.author.id === currentUserId ? 'border-brand-100 bg-brand-50/40' : 'border-slate-200 bg-white'}`}>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <span className="text-sm font-medium text-slate-900">{c.author.fullName}</span>
               {c.author.role !== 'employee' && <span className="text-xs text-slate-500">{ROLES[c.author.role]}</span>}
@@ -97,7 +97,7 @@ export function CommentThread({ comments, currentUserId }) {
               </time>
             </div>
             {/* Rendered as text: React escapes it, so user-supplied HTML is never executed. */}
-            <p className="mt-1.5 text-sm break-words whitespace-pre-wrap text-slate-700">{c.body}</p>
+            <p className="mt-2 text-sm break-words whitespace-pre-wrap text-slate-700">{c.body}</p>
           </div>
         </li>
       ))}

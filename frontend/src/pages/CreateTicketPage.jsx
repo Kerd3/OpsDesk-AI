@@ -18,7 +18,7 @@ export default function CreateTicketPage() {
   const queryClient = useQueryClient();
   // A draft prepared by the AI assistant arrives via router state and is only a starting point.
   const draft = location.state?.draft;
-  useBreadcrumbs([{ label: 'My Tickets', to: '/my-tickets' }, { label: 'New ticket' }]);
+  useBreadcrumbs([{ label: 'My tickets', to: '/my-tickets' }, { label: 'New ticket' }]);
 
   const { data: people } = useQuery({ queryKey: ['directory', 'all'], queryFn: () => usersApi.directory('all'), enabled: isStaff });
 

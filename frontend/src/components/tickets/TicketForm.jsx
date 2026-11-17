@@ -49,7 +49,7 @@ export function TicketForm({ defaultValues, onSubmit, submitLabel = 'Submit tick
           />
         )}
       </Field>
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-2">
         <Field label="Category" required error={errors.category?.message}>
           {(a) => <Select {...a} invalid={!!errors.category} options={toOptions(TICKET_CATEGORIES)} placeholder="Select a category" {...register('category', { required: 'Choose a category' })} />}
         </Field>

@@ -7,15 +7,15 @@ import { timeAgo } from '../../utils/format.js';
 
 export function KnowledgeBaseCard({ article, showStatus }) {
   return (
-    <Link to={`/knowledge-base/${article.slug}`} className="card group flex h-full flex-col p-5 transition-shadow hover:shadow-pop">
+    <Link to={`/knowledge-base/${article.slug}`} className="card group flex h-full flex-col p-6 transition-shadow hover:shadow-pop">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50">
-          <FileText className="size-[18px] text-brand-600" aria-hidden="true" />
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
+          <FileText className="size-4 text-slate-500" aria-hidden="true" />
         </div>
         {showStatus && article.status !== 'published' && <KbStatusBadge status={article.status} />}
       </div>
       <h3 className="mt-4 text-[15px] font-semibold text-slate-900 group-hover:text-brand-700">{article.title}</h3>
-      <p className="mt-1.5 line-clamp-2 flex-1 text-sm text-slate-500">{article.description}</p>
+      <p className="mt-2 line-clamp-2 flex-1 text-sm text-slate-500">{article.description}</p>
       <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-500">
         <Badge tone="gray">{TICKET_CATEGORIES[article.category]}</Badge>
         <span className="inline-flex items-center gap-1">

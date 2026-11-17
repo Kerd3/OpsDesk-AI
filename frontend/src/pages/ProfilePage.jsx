@@ -77,7 +77,7 @@ export default function ProfilePage() {
               <ul className="divide-y divide-slate-100">
                 {assets.data.data.map((a) => (
                   <li key={a.id}>
-                    <Link to={`/assets/${a.id}`} className="flex items-center justify-between gap-3 rounded-lg p-3 hover:bg-slate-50">
+                    <Link to={`/assets/${a.id}`} className="flex items-center justify-between gap-3 rounded-md p-3 hover:bg-slate-50">
                       <span className="flex min-w-0 items-center gap-3">
                         <Laptop className="size-4 shrink-0 text-slate-500" aria-hidden="true" />
                         <span className="min-w-0">

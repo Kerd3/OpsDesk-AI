@@ -24,7 +24,7 @@ export default function AssetDetailsPage() {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
   const { data: asset, isLoading, error, refetch } = useQuery({ queryKey: ['asset', id], queryFn: () => assetsApi.get(id) });
-  useBreadcrumbs([{ label: isStaff ? 'IT Assets' : 'My Equipment', to: '/assets' }, { label: asset?.assetTag ?? 'Asset' }]);
+  useBreadcrumbs([{ label: isStaff ? 'IT assets' : 'My equipment', to: '/assets' }, { label: asset?.assetTag ?? 'Asset' }]);
 
   const invalidate = [['asset', id], ['assets'], ['dashboard']];
   const maintenance = useApiMutation((status) => assetsApi.update(id, { status }), { invalidate, successMessage: (a) => (a.status === 'under_maintenance' ? 'Asset marked as under maintenance' : 'Asset is available again') });
@@ -94,7 +94,7 @@ export default function AssetDetailsPage() {
               {asset.history.length ? (
                 <ol className="divide-y divide-slate-100">
                   {asset.history.map((h) => (
-                    <li key={h.id} className="px-5 py-3">
+                    <li key={h.id} className="px-6 py-3">
                       <p className="text-sm text-slate-700">
                         <span className="font-medium text-slate-900">{h.actorName ?? 'System'}</span> {describeAssetEvent(h)}
                       </p>

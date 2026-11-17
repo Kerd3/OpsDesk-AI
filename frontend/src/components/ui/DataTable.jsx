@@ -22,9 +22,9 @@ export function DataTable({ columns, rows, loading, error, onRetry, empty, onRow
         <thead className="bg-slate-50/80">
           <tr>
             {columns.map((c) => (
-              <th key={c.key} scope="col" className={`px-4 py-2.5 text-xs font-semibold tracking-wide whitespace-nowrap text-slate-500 uppercase ${c.className ?? ''}`} aria-sort={c.sortKey && sort?.key === c.sortKey ? (sort.order === 'asc' ? 'ascending' : 'descending') : undefined}>
+              <th key={c.key} scope="col" className={`px-4 py-3 text-xs font-medium whitespace-nowrap text-slate-500 ${c.className ?? ''}`} aria-sort={c.sortKey && sort?.key === c.sortKey ? (sort.order === 'asc' ? 'ascending' : 'descending') : undefined}>
                 {c.sortKey && onSortChange ? (
-                  <button type="button" onClick={() => toggleSort(c.sortKey)} className="inline-flex items-center gap-1 uppercase hover:text-slate-800">
+                  <button type="button" onClick={() => toggleSort(c.sortKey)} className="inline-flex items-center gap-1 transition-colors hover:text-slate-900">
                     {c.header}
                     {sort?.key === c.sortKey && (sort.order === 'asc' ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />)}
                   </button>
@@ -40,7 +40,7 @@ export function DataTable({ columns, rows, loading, error, onRetry, empty, onRow
             ? Array.from({ length: 6 }, (_, i) => (
                 <tr key={i}>
                   {columns.map((c) => (
-                    <td key={c.key} className={`px-4 py-3.5 ${c.className ?? ''}`}>
+                    <td key={c.key} className={`px-4 py-4 ${c.className ?? ''}`}>
                       <Skeleton className="h-4 w-full max-w-[12rem]" />
                     </td>
                   ))}

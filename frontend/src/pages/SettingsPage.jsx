@@ -28,7 +28,7 @@ export default function SettingsPage() {
   const [filters, setFilters] = useUrlFilters({ tab: 'security' });
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="max-w-5xl">
       <PageHeader title="Settings" description={isAdmin ? 'Account security and system integrations.' : 'Manage your account security.'} />
       {isAdmin && (
         <div className="mb-6">
@@ -118,7 +118,7 @@ function IntegrationSettings({ filters, setFilters }) {
           </div>
         </Card>
 
-        <Card title="n8n workflow automation" description="Signed webhook events with retries" actions={<Webhook className="size-4 text-brand-500" aria-hidden="true" />}>
+        <Card title="n8n workflow automation" description="Signed webhook events with retries" actions={<Webhook className="size-4 text-slate-500" aria-hidden="true" />}>
           <div className="space-y-3">
             <StatusLine ok={webhook.urlConfigured} label={webhook.urlConfigured ? `Webhook URL configured (${webhook.host})` : 'N8N_WEBHOOK_URL not set — events are recorded as skipped'} />
             <StatusLine ok={webhook.secretConfigured} label={webhook.secretConfigured ? 'Signing secret configured' : 'N8N_WEBHOOK_SECRET not set'} />
@@ -142,6 +142,8 @@ function IntegrationSettings({ filters, setFilters }) {
         </div>
       </Card>
 
+      <section aria-labelledby="deliveries-7d">
+      <h2 id="deliveries-7d" className="mb-3 text-sm font-semibold text-slate-900">Deliveries in the last 7 days</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           ['Delivered', webhook.last7Days.delivered, 'text-emerald-700'],
@@ -150,11 +152,12 @@ function IntegrationSettings({ filters, setFilters }) {
           ['Skipped', webhook.last7Days.skipped, 'text-slate-700'],
         ].map(([label, value, color]) => (
           <div key={label} className="card p-4">
-            <p className="text-xs font-medium text-slate-500">{label} · 7 days</p>
-            <p className={`mt-1 text-2xl font-semibold tabular-nums ${color}`}>{value}</p>
+            <p className="text-sm text-slate-500">{label}</p>
+            <p className={`font-display mt-2 text-[28px] leading-none font-semibold tabular-nums ${value > 0 ? color : 'text-slate-900'}`}>{value}</p>
           </div>
         ))}
       </div>
+      </section>
 
       <Card
         title="Webhook deliveries"

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { Menu, Bell, ChevronRight, LogOut, User, Settings, Plus } from 'lucide-react';
+import { Menu, Bell, ChevronRight, LogOut, User, Settings, Plus, Search } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useCrumbs } from '../../context/BreadcrumbContext.jsx';
 import { dashboardApi } from '../../api/endpoints.js';
@@ -87,12 +87,12 @@ function NotificationMenu() {
 
   return (
     <div className="relative" ref={ref}>
-      <button type="button" onClick={toggle} className="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label={`Notifications${unread ? `, ${unread} new` : ''}`} aria-expanded={open}>
+      <button type="button" onClick={toggle} className="relative rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label={`Notifications${unread ? `, ${unread} new` : ''}`} aria-expanded={open}>
         <Bell className="size-5" />
-        {unread > 0 && <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500 ring-2 ring-white" aria-hidden="true" />}
+        {unread > 0 && <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500 ring-2 ring-night" aria-hidden="true" />}
       </button>
       {open && (
-        <div className="absolute right-0 z-40 mt-2 w-[min(22rem,calc(100vw-2rem))] animate-slide-up rounded-xl border border-slate-200 bg-white shadow-pop">
+        <div className="absolute right-0 z-40 mt-2 w-[min(22rem,calc(100vw-2rem))] origin-top-right animate-pop-in rounded-xl border border-slate-200 bg-white shadow-pop">
           <div className="border-b border-slate-100 px-4 py-3">
             <p className="text-sm font-semibold text-slate-900">Notifications</p>
             <p className="text-xs text-slate-500">Recent updates on your tickets</p>
@@ -133,7 +133,7 @@ function UserMenu() {
     <div className="relative" ref={ref}>
       {/* The accessible name comes from the content ("Sam Carter account menu"), so it always
           starts with the visible name — voice-control users can say what they see. */}
-      <button type="button" onClick={() => setOpen(!open)} className="flex items-center gap-2 rounded-lg p-1 pr-2 hover:bg-slate-100" aria-expanded={open}>
+      <button type="button" onClick={() => setOpen(!open)} className="flex items-center gap-2 rounded-md p-1 pr-2 hover:bg-slate-100" aria-expanded={open}>
         <Avatar name={user.fullName} />
         <span className="hidden text-left sm:block">
           <span className="block max-w-[10rem] truncate text-sm font-medium text-slate-900">{user.fullName}</span>
@@ -143,8 +143,8 @@ function UserMenu() {
         <span className="sr-only"> account menu</span>
       </button>
       {open && (
-        <div className="absolute right-0 z-40 mt-2 w-64 animate-slide-up rounded-xl border border-slate-200 bg-white p-1.5 shadow-pop" role="menu">
-          <div className="px-3 py-2.5">
+        <div className="absolute right-0 z-40 mt-2 w-64 origin-top-right animate-pop-in rounded-xl border border-slate-200 bg-white p-1.5 shadow-pop" role="menu">
+          <div className="px-3 py-3">
             <p className="truncate text-sm font-semibold text-slate-900">{user.fullName}</p>
             <p className="truncate text-xs text-slate-500">{user.email}</p>
             <div className="mt-2">
@@ -152,13 +152,13 @@ function UserMenu() {
             </div>
           </div>
           <div className="my-1 border-t border-slate-100" />
-          <Link role="menuitem" to="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
+          <Link role="menuitem" to="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
             <User className="size-4 text-slate-500" /> Profile
           </Link>
-          <Link role="menuitem" to="/settings" onClick={() => setOpen(false)} className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
+          <Link role="menuitem" to="/settings" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
             <Settings className="size-4 text-slate-500" /> Settings
           </Link>
-          <button role="menuitem" type="button" onClick={signOut} className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
+          <button role="menuitem" type="button" onClick={signOut} className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
             <LogOut className="size-4 text-slate-500" /> Sign out
           </button>
         </div>
@@ -167,16 +167,39 @@ function UserMenu() {
   );
 }
 
+/** Command-bar entry to the AI assistant. Ctrl+K / Cmd+K opens it from anywhere. */
+function AskAiBox() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        navigate('/assistant');
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [navigate]);
+  return (
+    <Link to="/assistant" className="hidden h-9 w-full max-w-sm items-center gap-2 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-500 transition-colors hover:border-slate-500 hover:text-slate-900 md:flex">
+      <Search className="size-4 shrink-0" aria-hidden="true" />
+      <span className="truncate">Ask AI about an IT problem</span>
+      <kbd className="ml-auto shrink-0 rounded border border-slate-300 px-1.5 font-mono text-[11px] text-slate-500">Ctrl K</kbd>
+    </Link>
+  );
+}
+
 export function Topbar({ onMenu }) {
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200 bg-white/90 px-4 backdrop-blur sm:px-6">
-      <button type="button" onClick={onMenu} className="-ml-1 rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden" aria-label="Open navigation">
+    <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-slate-200 bg-night/90 px-4 backdrop-blur sm:px-6">
+      <button type="button" onClick={onMenu} className="-ml-1 rounded-md p-2 text-slate-500 hover:bg-slate-100 lg:hidden" aria-label="Open navigation">
         <Menu className="size-5" />
       </button>
       <div className="min-w-0 flex-1">
         <Breadcrumbs />
       </div>
-      <ButtonLink to="/tickets/new" size="sm" icon={Plus} className="hidden sm:inline-flex">
+      <AskAiBox />
+      <ButtonLink to="/tickets/new" variant="secondary" icon={Plus} className="hidden sm:inline-flex">
         New ticket
       </ButtonLink>
       <NotificationMenu />

@@ -10,3 +10,6 @@ test-results/
 e2e/.auth/
 .DS_Store
 .vscode/
+
+# Local design mockups (not part of the app)
+design/midnight-command/
