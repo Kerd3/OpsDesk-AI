@@ -18,7 +18,7 @@ export default function ArticleEditorPage() {
   const { id } = useParams();
   const isNew = !id;
   const { data: article, isLoading, error } = useQuery({ queryKey: ['kb-article', id, 'edit'], queryFn: () => kbApi.get(id, { view: '0' }), enabled: !isNew });
-  useBreadcrumbs([{ label: 'Knowledge Base', to: '/knowledge-base' }, { label: isNew ? 'New article' : `Edit: ${article?.title ?? '…'}` }]);
+  useBreadcrumbs([{ label: 'Knowledge base', to: '/knowledge-base' }, { label: isNew ? 'New article' : `Edit: ${article?.title ?? '…'}` }]);
 
   if (!isNew && isLoading) return <LoadingSpinner />;
   if (error) return <Card><ErrorState error={error} /></Card>;
@@ -78,7 +78,7 @@ function ArticleForm({ article }) {
         }
       />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <Card bodyClassName="p-5 space-y-5">
+        <Card bodyClassName="p-6 space-y-5">
           <Field label="Title" required error={errors.title?.message}>
             {(a) => <Input {...a} invalid={!!errors.title} {...register('title', { required: 'Title is required', minLength: { value: 3, message: 'At least 3 characters' }, maxLength: { value: 200, message: 'At most 200 characters' } })} />}
           </Field>
@@ -110,7 +110,7 @@ function ArticleForm({ article }) {
                   )}
                 </Field>
               ) : (
-                <div className="min-h-[24rem] rounded-lg border border-slate-200 p-5">{content?.trim() ? <MarkdownView content={content} /> : <p className="text-sm text-slate-500">Nothing to preview yet.</p>}</div>
+                <div className="min-h-[24rem] rounded-md border border-slate-200 p-6">{content?.trim() ? <MarkdownView content={content} /> : <p className="text-sm text-slate-500">Nothing to preview yet.</p>}</div>
               )}
             </div>
           </div>

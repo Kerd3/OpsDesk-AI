@@ -25,7 +25,7 @@ export default function AssetsPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [creating, setCreating] = useState(false);
-  useBreadcrumbs([{ label: isStaff ? 'IT Assets' : 'My Equipment' }]);
+  useBreadcrumbs([{ label: isStaff ? 'IT assets' : 'My equipment' }]);
 
   const [filters, setFilters] = useUrlFilters();
   const [search, setSearch] = useDebouncedFilter(filters, setFilters);

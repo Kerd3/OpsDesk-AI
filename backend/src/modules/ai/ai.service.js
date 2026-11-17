@@ -95,6 +95,9 @@ export async function chat(_user, { message, history }) {
     grounded,
     sources: articles.filter((a) => usedIds.includes(a.id)).map(({ id, slug, title, description }) => ({ id, slug, title, description })),
     retrievedCount: articles.length,
+    // Every published article sent to the model as context, its full-text relevance
+    // and whether the answer cited it — lets the UI show how the answer was grounded.
+    considered: articles.map(({ id, slug, title, rank }) => ({ id, slug, title, rank, cited: usedIds.includes(id) })),
   };
 }
 

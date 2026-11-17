@@ -21,7 +21,7 @@ export default function ArticlePage() {
   const navigate = useNavigate();
   const [confirm, setConfirm] = useState(null);
   const { data: article, isLoading, error, refetch } = useQuery({ queryKey: ['kb-article', slug], queryFn: () => kbApi.get(slug) });
-  useBreadcrumbs([{ label: 'Knowledge Base', to: '/knowledge-base' }, { label: article?.title ?? 'Article' }]);
+  useBreadcrumbs([{ label: 'Knowledge base', to: '/knowledge-base' }, { label: article?.title ?? 'Article' }]);
 
   const invalidate = [['kb'], ['kb-article', slug]];
   const setStatus = useApiMutation((status) => kbApi.update(article.id, { status }), {
@@ -124,8 +124,8 @@ export default function ArticlePage() {
             <ul>
               {article.related.map((r) => (
                 <li key={r.id}>
-                  <Link to={`/knowledge-base/${r.slug}`} className="flex gap-2.5 rounded-lg p-3 hover:bg-slate-50">
-                    <BookOpen className="mt-0.5 size-4 shrink-0 text-brand-500" aria-hidden="true" />
+                  <Link to={`/knowledge-base/${r.slug}`} className="flex gap-2 rounded-md p-3 hover:bg-slate-50">
+                    <BookOpen className="mt-0.5 size-4 shrink-0 text-slate-500" aria-hidden="true" />
                     <span className="text-sm font-medium text-slate-800">{r.title}</span>
                   </Link>
                 </li>

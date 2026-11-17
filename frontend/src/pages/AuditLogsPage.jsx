@@ -24,7 +24,7 @@ const RESOURCE_TYPES = [
 const toneFor = (action) => (action.includes('failed') || action.includes('deactivated') || action.includes('deleted') ? 'red' : action.startsWith('auth') ? 'gray' : action.includes('created') ? 'green' : 'indigo');
 
 export default function AuditLogsPage() {
-  useBreadcrumbs([{ label: 'Audit Logs' }]);
+  useBreadcrumbs([{ label: 'Audit logs' }]);
   const [filters, setFilters] = useUrlFilters();
   const [search, setSearch] = useDebouncedFilter(filters, setFilters);
   const [selected, setSelected] = useState(null);
@@ -87,8 +87,8 @@ export default function AuditLogsPage() {
               <dd className="col-span-2 font-mono text-xs break-all">{selected.resourceType} {selected.resourceId}</dd>
             </dl>
             <div>
-              <p className="mb-1.5 text-xs font-semibold tracking-wide text-slate-500 uppercase">Metadata</p>
-              <pre className="max-h-72 overflow-auto rounded-lg bg-slate-950 p-3 text-xs text-slate-100">{JSON.stringify(selected.metadata, null, 2)}</pre>
+              <p className="mb-2 text-xs font-medium text-slate-500">Metadata</p>
+              <pre className="max-h-72 overflow-auto rounded-md border border-slate-200 bg-night p-3 font-mono text-xs text-slate-800">{JSON.stringify(selected.metadata, null, 2)}</pre>
             </div>
             <Alert tone="info" icon={ShieldCheck}>
               Audit metadata never includes passwords, tokens or message contents.

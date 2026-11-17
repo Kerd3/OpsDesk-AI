@@ -20,7 +20,7 @@ export default function TicketListPage({ scope }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const isMine = scope === 'mine';
-  useBreadcrumbs([{ label: isMine ? 'My Tickets' : 'All Tickets' }]);
+  useBreadcrumbs([{ label: isMine ? 'My tickets' : 'All tickets' }]);
 
   const [filters, setFilters] = useUrlFilters({ sort: 'updated', order: 'desc' });
   const [search, setSearch] = useDebouncedFilter(filters, setFilters);

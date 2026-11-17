@@ -11,9 +11,15 @@ test('assistant answers from the knowledge base with source links, and drafts a 
 
   const answer = page.locator('main').getByText('Based on the knowledge base articles provided');
   await expect(answer).toBeVisible();
-  const source = page.getByRole('link', { name: /How to connect to the office Wi-Fi/ });
+  // The answer's numbered source link ("1 How to connect…").
+  const source = page.getByRole('link', { name: /^1 How to connect to the office Wi-Fi/ });
   await expect(source).toBeVisible();
   await expect(source).toHaveAttribute('href', '/knowledge-base/connect-to-office-wifi');
+
+  // The side panel lists the articles the AI was given, and which one it cited.
+  const searched = page.getByRole('complementary', { name: 'How the answer was found' });
+  const wifiEntry = searched.getByRole('listitem').filter({ hasText: 'How to connect to the office Wi-Fi' });
+  await expect(wifiEntry).toContainText('Cited in the answer');
 
   // Draft a ticket from the conversation: nothing is submitted until the employee confirms.
   await page.getByRole('button', { name: 'Create ticket from chat' }).click();

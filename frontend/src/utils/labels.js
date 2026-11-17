@@ -5,8 +5,8 @@ export const TICKET_CATEGORIES = {
   software: 'Software',
   network: 'Network',
   printer: 'Printer',
-  email_accounts: 'Email and Accounts',
-  access_permissions: 'Access and Permissions',
+  email_accounts: 'Email and accounts',
+  access_permissions: 'Access and permissions',
   other: 'Other',
 };
 
@@ -14,8 +14,8 @@ export const TICKET_PRIORITIES = { low: 'Low', medium: 'Medium', high: 'High', u
 
 export const TICKET_STATUSES = {
   open: 'Open',
-  in_progress: 'In Progress',
-  waiting_for_employee: 'Waiting for Employee',
+  in_progress: 'In progress',
+  waiting_for_employee: 'Waiting on employee',
   resolved: 'Resolved',
   closed: 'Closed',
 };
@@ -32,7 +32,7 @@ export const ASSET_CATEGORIES = {
   mouse: 'Mouse',
   other: 'Other',
 };
-export const ASSET_STATUSES = { available: 'Available', assigned: 'Assigned', under_maintenance: 'Under Maintenance', retired: 'Retired' };
+export const ASSET_STATUSES = { available: 'Available', assigned: 'Assigned', under_maintenance: 'Under maintenance', retired: 'Retired' };
 export const ASSET_CONDITIONS = { new: 'New', good: 'Good', fair: 'Fair', poor: 'Poor', damaged: 'Damaged' };
 
 export const ROLES = { admin: 'Administrator', it_support: 'IT Support', employee: 'Employee' };

@@ -12,7 +12,7 @@
 - **Real role-based security.** Three roles are enforced in the API, not just hidden in the UI. Private tickets return 404 to other employees, even when the id is guessed. Internal notes never reach employees. Sessions are server-side and HTTP-only, with synchronizer-token CSRF protection, bcrypt password hashing, rate limiting, Helmet headers and an append-only audit log protected by database triggers.
 - **Reliable automation.** Ticket events use a transactional outbox → HMAC-signed webhooks → n8n → Gmail. Delivery retries with exponential backoff and idempotent event ids, and an admin delivery monitor offers one-click retry. n8n being down never affects tickets.
 - **Live analytics.** Role-specific dashboards and reports (bar, line and donut charts plus tables) are computed from SQL, with date filters.
-- **Professional, responsive UI.** React 19, Tailwind CSS 4 and accessible components, with loading, empty, error and success states on every page. Verified for overflow at 1440/1024/768/390 px.
+- **"Midnight Command" interface.** A dark operations console (IBM Plex type, one teal signal color for focus, actions and AI citations), where AI answers show which help article each step came from and which articles were searched. React 19, Tailwind CSS 4 and accessible components, with loading, empty, error and success states on every page. Verified at 1440/1024/768/390 px.
 - **Tested.** 125 API tests, 28 Playwright end-to-end tests (including a WCAG 2.1 AA accessibility scan with 0 violations) and 11 live checks against the real Gemini API, all passing. See [docs/testing.md](docs/testing.md).
 
 ## Tech stack

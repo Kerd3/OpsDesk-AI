@@ -47,15 +47,15 @@ export function Modal({ open, onClose, title, description, children, footer, siz
 
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4">
-      <div className="absolute inset-0 animate-fade-in bg-slate-900/40" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 animate-fade-in bg-black/60" onClick={onClose} aria-hidden="true" />
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className={`relative flex max-h-[92vh] w-full animate-slide-up flex-col rounded-t-2xl bg-white shadow-pop sm:rounded-2xl ${widths[size]}`}
+        className={`relative flex max-h-[92vh] w-full animate-slide-up flex-col sm:animate-pop-in rounded-t-2xl bg-white shadow-pop sm:rounded-xl ${widths[size]}`}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-4">
           <div>
             <h2 id={titleId} className="text-base font-semibold text-slate-900">
               {title}
@@ -66,8 +66,8 @@ export function Modal({ open, onClose, title, description, children, footer, siz
             <X className="size-5" />
           </button>
         </div>
-        <div className="overflow-y-auto px-5 py-4">{children}</div>
-        {footer && <div className="flex flex-col-reverse gap-2 border-t border-slate-100 px-5 py-3 sm:flex-row sm:justify-end">{footer}</div>}
+        <div className="overflow-y-auto px-6 py-4">{children}</div>
+        {footer && <div className="flex flex-col-reverse gap-2 border-t border-slate-100 px-6 py-3 sm:flex-row sm:justify-end">{footer}</div>}
       </div>
     </div>,
     document.body,

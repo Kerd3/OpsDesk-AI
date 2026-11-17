@@ -16,11 +16,11 @@ export function Field({ label, error, hint, required, children, className = '', 
       )}
       {children({ id, 'aria-invalid': error ? true : undefined, 'aria-describedby': describedBy })}
       {error ? (
-        <p id={`${id}-error`} className="mt-1.5 text-xs font-medium text-red-600">
+        <p id={`${id}-error`} className="mt-2 text-xs font-medium text-red-600">
           {error}
         </p>
       ) : hint ? (
-        <p id={`${id}-hint`} className="mt-1.5 text-xs text-slate-500">
+        <p id={`${id}-hint`} className="mt-2 text-xs text-slate-500">
           {hint}
         </p>
       ) : null}

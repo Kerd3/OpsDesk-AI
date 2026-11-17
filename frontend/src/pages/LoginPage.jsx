@@ -39,11 +39,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-night">
       <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm">
           <Logo />
-          <h1 className="mt-10 text-2xl font-semibold tracking-tight text-slate-900">Sign in to your workspace</h1>
+          <h1 className="font-display mt-10 text-[28px] leading-tight font-semibold tracking-tight text-slate-900">Sign in to your workspace</h1>
           <p className="mt-2 text-sm text-slate-500">Use your company account to get IT help, track requests and find answers.</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" noValidate>
@@ -78,7 +78,7 @@ export default function LoginPage() {
           {/* Local development helper: fills the email only. The password comes from SEED_DEMO_PASSWORD. */}
           {import.meta.env.DEV && (
             <div className="mt-8 rounded-xl border border-dashed border-slate-300 p-4">
-              <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Local demo accounts</p>
+              <p className="text-xs font-medium text-slate-500">Local demo accounts</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {DEMO_ACCOUNTS.map((a) => (
                   <button
@@ -88,7 +88,7 @@ export default function LoginPage() {
                       setValue('email', a.email, { shouldValidate: true });
                       setFocus('password');
                     }}
-                    className="rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-brand-300 hover:bg-brand-50"
+                    className="rounded-md border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-brand-300 hover:text-slate-900"
                   >
                     {a.label}
                   </button>
@@ -100,30 +100,38 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="relative hidden flex-1 overflow-hidden bg-brand-950 lg:block">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(107,120,212,0.35),transparent_55%)]" aria-hidden="true" />
-        <div className="relative flex h-full flex-col justify-center px-16 xl:px-24">
-          <p className="text-sm font-semibold tracking-wide text-brand-300 uppercase">Internal IT & business support</p>
-          <h2 className="mt-4 max-w-md text-3xl leading-tight font-semibold text-white">Help that answers from your own documentation.</h2>
-          <ul className="mt-10 max-w-md space-y-6">
-            {[
-              [Sparkles, 'AI troubleshooting', 'Answers grounded in published company articles, with sources you can open.'],
-              [BookOpen, 'One knowledge base', 'IT maintains approved procedures that employees and the assistant share.'],
-              [ShieldCheck, 'Role-based access', 'Private tickets and internal notes stay with the people who need them.'],
-            ].map(([Icon, title, text]) => (
-              <li key={title} className="flex gap-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/15">
-                  <Icon className="size-5 text-brand-200" aria-hidden="true" />
-                </div>
-                <div>
-                  <p className="font-medium text-white">{title}</p>
-                  <p className="mt-1 text-sm text-brand-200/90">{text}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+      <section className="relative hidden flex-1 flex-col justify-center border-l border-slate-200 bg-white bg-[radial-gradient(120%_80%_at_80%_10%,rgb(45_212_191/0.08),transparent_60%)] px-16 lg:flex xl:px-24" aria-label="What OpsDesk does">
+        <h2 className="font-display max-w-md text-2xl leading-snug font-semibold text-slate-900">Answers come from your company's own help articles.</h2>
+        <p className="mt-2 max-w-lg text-slate-500">Ask about a problem in plain words. OpsDesk shows the steps and the article each one came from, and hands you to IT when the articles don't cover it.</p>
+        {/* A static example of a cited answer (fictional demo content). */}
+        <div className="mt-8 grid max-w-xl gap-4 rounded-xl border border-slate-200 bg-night p-6" aria-hidden="true">
+          <p className="justify-self-end rounded-xl rounded-br-sm border border-slate-300 bg-slate-50 px-4 py-2 text-sm text-slate-900">The printer on 2nd floor east shows offline</p>
+          <div className="flex gap-3">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-brand-300 bg-brand-50">
+              <Sparkles className="size-3.5 text-brand-500" />
+            </span>
+            <div className="grid flex-1 gap-3">
+              <ol className="border-l border-slate-300">
+                {["Check the printer's display for an error and that it is powered on.", 'Make sure your laptop is on HV-Corp, not HV-Guest.', 'Open the print queue and cancel stuck documents.'].map((step, i) => (
+                  <li key={step} className="relative py-1 pl-6 text-sm text-slate-900">
+                    <span className="absolute top-1.5 -left-[10px] grid size-[19px] place-items-center rounded-full border border-slate-300 bg-night font-mono text-[10px] font-semibold text-slate-500">{i + 1}</span>
+                    {step}
+                    <span className="ml-1.5 inline-grid h-4 min-w-[18px] place-items-center rounded bg-brand-50 px-1 align-[2px] font-mono text-[10px] font-semibold text-brand-500">1</span>
+                  </li>
+                ))}
+              </ol>
+              <p className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900">
+                <span className="font-mono text-[11px] font-semibold text-brand-500">1</span>
+                <BookOpen className="size-3.5 text-slate-500" />
+                How to troubleshoot an office printer
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
+        <ul className="mt-8 grid max-w-xl gap-2 text-sm text-slate-500">
+          <li className="flex items-center gap-2"><ShieldCheck className="size-4 text-brand-500" aria-hidden="true" />Private tickets and internal notes stay with the people who need them.</li>
+        </ul>
+      </section>
     </div>
   );
 }

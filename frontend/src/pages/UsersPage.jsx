@@ -19,7 +19,7 @@ import { ROLES, toOptions } from '../utils/labels.js';
 import { timeAgo } from '../utils/format.js';
 
 export default function UsersPage() {
-  useBreadcrumbs([{ label: 'User Management' }]);
+  useBreadcrumbs([{ label: 'User management' }]);
   const { user: me } = useAuth();
   const [filters, setFilters] = useUrlFilters();
   const [search, setSearch] = useDebouncedFilter(filters, setFilters);

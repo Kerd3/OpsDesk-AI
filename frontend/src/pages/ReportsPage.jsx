@@ -19,7 +19,7 @@ const PRESETS = [
   { value: 'custom', label: 'Custom range' },
 ];
 // Fixed colours so priority/status read consistently across charts.
-const PRIORITY_COLORS = ['#94a3b8', '#0ea5e9', '#f59e0b', '#ef4444'];
+const PRIORITY_COLORS = ['#8a97a8', '#60a5fa', '#f5b544', '#ff6b6b'];
 
 export default function ReportsPage() {
   useBreadcrumbs([{ label: 'Reports' }]);
@@ -69,11 +69,11 @@ export default function ReportsPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
             <DashboardCard loading={!s} label="Tickets created" value={s?.tickets.total} icon={Ticket} />
-            <DashboardCard loading={!s} label="Still open" value={s ? s.tickets.open + s.tickets.inProgress + s.tickets.waiting : null} icon={CircleDot} accent="blue" />
-            <DashboardCard loading={!s} label="Resolved" value={s?.tickets.resolved} icon={CheckCircle2} accent="green" />
-            <DashboardCard loading={!s} label="Avg. resolution" value={formatHours(s?.resolution.averageHours)} icon={Timer} accent="brand" hint={s ? `Median ${formatHours(s.resolution.medianHours)} · ${s.resolution.resolvedCount} resolved` : undefined} />
-            <DashboardCard loading={!s} label="Urgent open" value={s?.tickets.urgentOpen} icon={AlertTriangle} accent="red" />
-            <DashboardCard loading={!s} label="Unassigned" value={s?.tickets.unassigned} icon={Inbox} accent="amber" />
+            <DashboardCard loading={!s} label="Still open" value={s ? s.tickets.open + s.tickets.inProgress + s.tickets.waiting : null} icon={CircleDot} />
+            <DashboardCard loading={!s} label="Resolved" value={s?.tickets.resolved} icon={CheckCircle2} />
+            <DashboardCard loading={!s} label="Avg. resolution" value={formatHours(s?.resolution.averageHours)} icon={Timer} hint={s ? `Median ${formatHours(s.resolution.medianHours)} · ${s.resolution.resolvedCount} resolved` : undefined} />
+            <DashboardCard loading={!s} label="Urgent open" value={s?.tickets.urgentOpen} icon={AlertTriangle} />
+            <DashboardCard loading={!s} label="Unassigned" value={s?.tickets.unassigned} icon={Inbox} />
           </div>
 
           <Card title="Ticket trend" description={r ? `Created vs. resolved per ${r.range.interval}` : undefined}>

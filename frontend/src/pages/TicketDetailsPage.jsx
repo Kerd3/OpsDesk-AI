@@ -26,7 +26,7 @@ export default function TicketDetailsPage() {
   const { data: ticket, isLoading, error, refetch } = useQuery({ queryKey: ['ticket', id], queryFn: () => ticketsApi.get(id) });
   const { data: staff } = useQuery({ queryKey: ['directory', 'staff'], queryFn: () => usersApi.directory('staff'), enabled: isStaff });
 
-  useBreadcrumbs([{ label: user.role === 'employee' ? 'My Tickets' : 'All Tickets', to: user.role === 'employee' ? '/my-tickets' : '/tickets' }, { label: ticket?.ticketNumber ?? 'Ticket' }]);
+  useBreadcrumbs([{ label: user.role === 'employee' ? 'My tickets' : 'All tickets', to: user.role === 'employee' ? '/my-tickets' : '/tickets' }, { label: ticket?.ticketNumber ?? 'Ticket' }]);
 
   const invalidate = [['ticket', id], ['tickets'], ['dashboard'], ['notifications']];
   const update = useApiMutation((patch) => ticketsApi.update(id, patch), { invalidate, successMessage: 'Ticket updated' });
@@ -103,7 +103,7 @@ export default function TicketDetailsPage() {
           </Card>
 
           <Card bodyClassName="p-0">
-            <div className="px-5 pt-2">
+            <div className="px-6 pt-2">
               <Tabs
                 label="Ticket sections"
                 value={tab}
@@ -114,7 +114,7 @@ export default function TicketDetailsPage() {
                 ]}
               />
             </div>
-            <div className="p-5">
+            <div className="p-6">
               {tab === 'conversation' ? (
                 <div className="space-y-6">
                   {isStaff && internalCount > 0 && <p className="text-xs text-slate-500"><Lock className="mr-1 inline size-3" aria-hidden="true" />{internalCount} internal note{internalCount > 1 ? 's' : ''} — hidden from the requester.</p>}
@@ -223,7 +223,7 @@ function CommentComposer({ ticketId, allowInternal, invalidate }) {
               role="radio"
               aria-checked={internal === value}
               onClick={() => setInternal(value)}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium ${internal === value ? (value ? 'bg-amber-100 text-amber-900' : 'bg-slate-900 text-white') : 'text-slate-500 hover:bg-slate-100'}`}
+              className={`rounded-md px-2.5 py-1 text-xs font-medium ${internal === value ? (value ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-900') : 'text-slate-500 hover:bg-slate-100'}`}
             >
               {value && <Lock className="mr-1 inline size-3" aria-hidden="true" />}
               {label}

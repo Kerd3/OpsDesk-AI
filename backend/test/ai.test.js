@@ -67,6 +67,13 @@ describe('POST /api/ai/chat', () => {
     assert.equal(data.grounded, true);
     assert.ok(data.sources.some((s) => s.slug === 'connect-to-office-wifi' && s.title));
     assert.ok(data.steps.length > 0);
+
+    // The considered list mirrors exactly what the model received, with relevance and citation.
+    assert.equal(data.considered.length, data.retrievedCount);
+    const consideredWifi = data.considered.find((c) => c.slug === 'connect-to-office-wifi');
+    assert.equal(consideredWifi.cited, true);
+    assert.ok(consideredWifi.rank > 0);
+    assert.ok(data.considered.every((c) => userTurn.includes(c.id)), 'only articles that were sent to the model are listed');
   });
 
   test('discards citations to articles that were not retrieved', async () => {

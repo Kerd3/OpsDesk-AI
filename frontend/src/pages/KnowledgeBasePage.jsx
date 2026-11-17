@@ -14,7 +14,7 @@ import { TICKET_CATEGORIES, KB_STATUSES, toOptions } from '../utils/labels.js';
 
 export default function KnowledgeBasePage() {
   const { isStaff } = useAuth();
-  useBreadcrumbs([{ label: 'Knowledge Base' }]);
+  useBreadcrumbs([{ label: 'Knowledge base' }]);
   const [filters, setFilters] = useUrlFilters();
   const [search, setSearch] = useDebouncedFilter(filters, setFilters);
 
